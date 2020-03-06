@@ -1,0 +1,27 @@
+{
+  "name": "puneet-sample-serverless-framework",
+  "version": "1.0.0",
+  "description": "Execute test cases inside lambda function",
+  "main": "index.js",
+  "scripts": {
+    "execute-tests": "npx mocha --recursive test-scripts --reporter mochawesome --reporter-options reportTitle=My Custom Title,showPassed=false"
+  },
+  "author": "Puneet Punj",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.437.0",
+    "fs": "0.0.1-security",
+    "good-mocha-html-reporter": "^2.0.1",
+    "lodash": "^4.17.11",
+    "mocha-junit-reporter": "^1.22.0",
+    "mocha-multi-reporters": "^1.1.7",
+    "mocha-parallel-tests": "^2.2.1",
+    "mochawesome": "^4.1.0",
+    "moment-timezone": "^0.5.26",
+    "request": "^2.88.0"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^5.2.0"
+  }
+}
