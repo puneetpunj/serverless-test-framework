@@ -1,0 +1,21 @@
+---
+template_path: templates/initiative.yaml
+
+stack_name: "{{var.project}}-test-stack"
+
+parameters:
+  ProjectName: {{var.project}}
+  Environment: {{var.environment}}
+  Region: {{var.region}}
+  LambdaFunctionBucket: {{var.artefact_bucket}}
+  LambdaFunctionKey: {{var.key}}
+  SubnetIDs:
+  - !stack_output_external VPC-{{var.environment}}::SubnetPrivateA
+  - !stack_output_external VPC-{{var.environment}}::SubnetPrivateB
+
+  VPCId: !stack_output_external VPC-{{var.environment}}::VPCID
+
+stack_tags:
+  CostCentre: {{var.tag_CostCentre}}
+  Project: {{var.tag_Project}}
+  Initiative: {{var.tag_Initiative}}

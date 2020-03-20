@@ -1,0 +1,18 @@
+---
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+    # - make lint
+    - make validate
+  build:
+    commands:
+    - make build
+  post_build:
+    commands:
+    - make package
+    - make clean
+artifacts:
+  files:
+  - "**/*"

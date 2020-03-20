@@ -1,0 +1,10 @@
+---
+project: 'test'
+region: 'ap-southeast-2'
+environment: 'Development'
+
+iam_role: 'arn:aws:iam::accountnumber:role/role-name'
+
+tag_CostCentre: '12345'
+tag_Project: 'project-name'
+tag_Initiative: 'qa'

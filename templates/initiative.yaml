@@ -1,0 +1,131 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: test initiative template
+
+Parameters:
+  ProjectName:
+    Type: String
+    Description: The name of this project
+    Default: project-name
+  TeamName:
+    Type: String
+    Description: The name of this project's team
+    Default: team-name
+  Environment:
+    Type: String
+    Description: Then environment the lake is deployed to
+    Default: Development
+    AllowedValues: [ Development, Production ]
+  LambdaFunctionBucket:
+    Type: String
+    Description: Bucket where lambda code is stored
+  LambdaFunctionKey:
+    Type: String
+    Description: Key of lambda code
+  LambdaFunctionMemory:
+    Type: Number
+    Description: The amount of memory, in MB, that is allocated to your Lambda function. 128 <= mem <= 3008, multiple of 64
+    Default: 512
+  SubnetIDs:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Subnet IDs the lambda will be connected to
+  VPCId:
+    Type: String
+    Description: ID of VPC in which instances will be created in
+  Region:
+    Type: String
+    Description: AWS region
+Mappings:
+  EnvMap:
+    Environment:
+      Development: dev
+      Production: prod
+
+Resources:
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+        - Effect: Allow
+          Action: sts:AssumeRole
+          Principal:
+            Service: lambda.amazonaws.com
+      Policies:
+      - PolicyName: LambdaRole
+        PolicyDocument:
+          Version: 2012-10-17
+          Statement:
+          - Effect: Allow
+            Action:
+            - logs:CreateLogGroup
+            Resource:
+            - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group"
+            - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*"
+          - Effect: "Allow"
+            Action:
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+            Resource:
+            - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*"
+          - Effect: "Allow"
+            Action:
+            - s3:*
+            - ec2:*
+            Resource: "*"
+          - Effect: "Allow"
+            Action:
+            - SNS:*
+            Resource: "*"
+
+  LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: !Ref LambdaFunctionBucket
+        S3Key: !Ref LambdaFunctionKey
+      Handler: index.handler
+      FunctionName: automated-test-function
+      Environment:
+        Variables:
+          REGION: !Ref Region
+      Role: !GetAtt LambdaRole.Arn
+      Runtime: nodejs10.x
+      Timeout: 120
+      MemorySize: !Ref LambdaFunctionMemory
+
+  SNSTopic:
+    Type: "AWS::SNS::Topic"
+    Properties:
+      DisplayName: test-notification-topic
+      TopicName: test-notification-topic
+      Subscription:
+      - Endpoint: "puneetpunj88@gmail.com"
+        Protocol: email             
+
+  CloudWatchEvent:
+      Type: AWS::Events::Rule
+      Properties:
+        Description: "Scheduled event to trigger lambda to send email"
+        Name: "lambda-trigger"
+        ScheduleExpression: "cron(00 03 * * ? *)"
+        State: "ENABLED"
+        Targets:
+        - Arn:
+            Fn::GetAtt:
+            - "LambdaFunction"
+            - "Arn"
+          Id: "TargetFunctionV1"
+
+  PermissionForCWRuleToInvokeLambda:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName:
+        Ref: "LambdaFunction"
+      Action: "lambda:InvokeFunction"
+      Principal: "events.amazonaws.com"
+      SourceArn:
+        Fn::GetAtt:
+        - "CloudWatchEvent"
+        - "Arn"

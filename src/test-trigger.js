@@ -17,7 +17,7 @@ const params = {
     TopicArn: `arn:aws:sns:ap-southeast-2:864459042878:TestFailureNotification`
 }
 
-exports.testexecution = (event) => {
+// exports.testexecution = (event) => {
     currentdatetime = moment().tz('Australia/Sydney').format('DDMMYYYY-HHmmss')
     const reportDirectory = 'execution-report-' + currentdatetime;
     const mocha = new Mocha({
@@ -61,4 +61,4 @@ exports.testexecution = (event) => {
 
         });
     }));
-}
+// }

@@ -1,0 +1,32 @@
+---
+version: "3.4"
+
+services:
+  sceptre:
+    image: contino/sceptre:1.4.2
+    env_file: .env
+    working_dir: /opt/app
+    volumes:
+    - ~/.aws:/root/.aws:ro
+    - .:/opt/app:rw
+  aws:
+    image: contino/aws-cli:1.16.21
+    privileged: true
+    env_file: .env
+    working_dir: /app
+    volumes:
+    - .:/app
+  
+  jslint:
+    image: cytopia/eslint
+    env_file: .env
+    entrypoint: []
+    volumes:
+    - .:/apps
+  node:
+    image: node:10
+    entrypoint: []
+    env_file: .env
+    working_dir: /app
+    volumes:
+    - .:/app

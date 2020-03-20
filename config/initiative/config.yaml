@@ -1,0 +1,7 @@
+---
+project_code: '{{ var.project }}'
+region: '{{ var.region }}'
+
+{% if var.iam_role %}
+iam_role: {{ var.iam_role }}
+{% endif %}
